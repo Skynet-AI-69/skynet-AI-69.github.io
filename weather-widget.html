@@ -7,7 +7,7 @@
   <style>
     :root {
       color-scheme: light dark;
-      --bg: transparent;
+      --bg: #fff;
       --card: transparent;
       --text: #2c2c2b;
       --muted: #7d7a75;
@@ -28,7 +28,7 @@
     .top { padding: 18px 18px 16px; background: linear-gradient(145deg, var(--accent-soft), transparent 70%); }
     .toolbar { display: flex; gap: 8px; align-items: center; }
     .search { min-width: 0; flex: 1; position: relative; }
-    input { width: 100%; height: 40px; padding: 0 12px 0 38px; border: 1px solid var(--line); border-radius: 10px; outline: none; background: var(--card); color: var(--text); font: inherit; }
+    input { width: 100%; height: 40px; padding: 0 12px 0 38px; border: 1px solid var(--line); border-radius: 10px; outline: none; color: var(--text); font: inherit; }
     input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); }
     .search-icon { position: absolute; left: 12px; top: 11px; color: var(--muted); pointer-events: none; }
     button { height: 40px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--text); cursor: pointer; font: inherit; padding: 0 11px; }
