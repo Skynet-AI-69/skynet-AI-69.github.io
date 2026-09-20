@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Digital clock</title>
+<style>
+:root{color-scheme:light dark;--bg:#fff;--surface:#f9f8f7;--text:#2c2c2b;--muted:#7d7a75;--line:#e6e5e3;--accent:#2783de;--glow:rgba(39,131,222,.18)}
+@media(prefers-color-scheme:dark){:root{--bg:#191919;--surface:#202020;--text:#fff;--muted:rgba(255,255,255,.65);--line:rgba(255,255,255,.18);--accent:#5e9fe8;--glow:rgba(94,159,232,.22)}}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%}body{display:grid;place-items:center;background:transparent;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif}.wrap{width:min(100%,620px);padding:14px}.clock{position:relative;overflow:hidden;padding:30px 32px 25px;border:1px solid var(--line);border-radius:18px;background:var(--surface);box-shadow:0 10px 30px rgba(0,0,0,.08)}.clock:before{content:"";position:absolute;inset:-100px auto auto -80px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,var(--glow),transparent 68%);pointer-events:none}.top{position:relative;display:flex;justify-content:space-between;align-items:center;gap:16px}.place{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:14px}.dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px var(--glow)}button{min-width:44px;height:44px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--text);font:600 13px/1 inherit;cursor:pointer}button:hover{border-color:var(--accent)}button:focus-visible{outline:3px solid var(--glow);outline-offset:2px}.time-row{position:relative;display:flex;align-items:flex-end;gap:14px;margin-top:25px}.time{font:700 clamp(54px,15vw,104px)/.86 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;letter-spacing:-.075em;font-variant-numeric:tabular-nums lining-nums}.colon{display:inline-block;transform:translateY(-.06em);color:var(--accent);animation:pulse 2s steps(1,end) infinite}.side{display:grid;gap:5px;padding-bottom:6px}.seconds{color:var(--accent);font:700 24px/1 ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}.period{color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.08em}.date{position:relative;margin-top:22px;padding-top:18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;color:var(--muted);font-size:14px}.date strong{color:var(--text);font-weight:650}.tz{white-space:nowrap}@keyframes pulse{0%,49%{opacity:1}50%,100%{opacity:.28}}@media(prefers-reduced-motion:reduce){.colon{animation:none}}@media(max-width:480px){.wrap{padding:8px}.clock{padding:24px 20px 21px}.time-row{gap:9px;margin-top:23px}.time{font-size:clamp(48px,19vw,72px)}.seconds{font-size:20px}.date{align-items:flex-start;flex-direction:column;gap:4px}.tz{white-space:normal}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<section class="clock" aria-label="Digital clock">
+  <div class="top"><div class="place"><span class="dot" aria-hidden="true"></span><span id="zoneLabel">Local time</span></div><button id="format" type="button" aria-label="Switch between 12 and 24 hour time">24H</button></div>
+  <div class="time-row">
+    <div id="time" class="time" aria-live="off">00<span class="colon">:</span>00</div>
+    <div class="side"><div id="seconds" class="seconds">00</div><div id="period" class="period"></div></div>
+  </div>
+  <div class="date"><strong id="date">Monday, 1 January</strong><span id="timezone" class="tz"></span></div>
+</section>
+</main>
+<script>
+(()=>{
+ const p=new URLSearchParams(location.search), requestedZone=p.get('timezone')||'', label=p.get('label')||'';
+ let zone=requestedZone, use24=p.get('format')!=='12';
+ try{if(zone)new Intl.DateTimeFormat('en',{timeZone:zone}).format()}catch{zone=''}
+ const effectiveZone=zone||Intl.DateTimeFormat().resolvedOptions().timeZone;
+ const $=id=>document.getElementById(id), pad=n=>String(n).padStart(2,'0');
+ $('zoneLabel').textContent=label||requestedZone.replaceAll('_',' ')||'Local time';
+ $('format').textContent=use24?'24H':'12H';
+ $('timezone').textContent=effectiveZone.replaceAll('_',' ');
+ function parts(now){return Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:effectiveZone,hour:'numeric',minute:'2-digit',second:'2-digit',hour12:!use24,weekday:'long',day:'numeric',month:'long'}).formatToParts(now).map(x=>[x.type,x.value]))}
+ function tick(){const x=parts(new Date()),hour=use24?pad(x.hour==='24'?0:x.hour):x.hour;$('time').innerHTML=`${hour}<span class="colon">:</span>${x.minute}`;$('seconds').textContent=x.second;$('period').textContent=use24?'':x.dayPeriod;$('date').textContent=`${x.weekday}, ${x.day} ${x.month}`;document.title=`${hour}:${x.minute} · Digital clock`}
+ $('format').addEventListener('click',()=>{use24=!use24;$('format').textContent=use24?'24H':'12H';tick()});
+ tick();setInterval(tick,1000);
+})();
+</script>
+</body>
+</html>
